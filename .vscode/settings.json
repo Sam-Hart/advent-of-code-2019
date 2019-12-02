@@ -1,0 +1,13 @@
+{
+    "eslint.alwaysShowStatus": true,
+    "eslint.validate": [
+        {
+            "language": "typescript",
+            "autoFix": true
+        },
+        {
+            "language": "javascript"
+        }
+    ],
+    "editor.tabSize": 2
+}
