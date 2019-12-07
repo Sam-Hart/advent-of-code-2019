@@ -165,13 +165,6 @@ export function part2 (puzzleInput: string): number {
           }
         }
         return combinedDistances
-        // return schematic.map(path => {
-        //   if (path.pointRestsOnLine(intersection)) {
-        //     return path.p.distanceFrom(intersection)
-        //   } else {
-        //     return path.length()
-        //   }
-        // }).reduce((totalDistance, l) => totalDistance + l)
       }).reduce((combinedDistances, schematicDistanceToPoint) => {
         return combinedDistances + schematicDistanceToPoint
       })
