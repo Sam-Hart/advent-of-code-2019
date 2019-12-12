@@ -46,17 +46,17 @@ test('Simple read should work', async done => {
 
 test('immediate mode params should work', async done => {
   const mock = new MockClient()
-  const comp = new Computer([11001, 16, 16, 5, 99], mock)
+  const comp = new Computer([1101, 16, 16, 5, 99], mock)
   const result = await comp.executeProgram()
-  expect(result).toEqual([11001, 16, 16, 5, 99, 32])
+  expect(result).toEqual([1101, 16, 16, 5, 99, 32])
   done()
 })
 
 test('more immediate mode params should work', async done => {
   const mock = new MockClient()
-  const comp = new Computer([10002, 16, 5, 6, 99, 7], mock)
+  const comp = new Computer([102, 16, 5, 6, 99, 7], mock)
   const result = await comp.executeProgram()
-  expect(result).toEqual([10002, 16, 5, 6, 99, 7, 112])
+  expect(result).toEqual([102, 16, 5, 6, 99, 7, 112])
   done()
 })
 
@@ -82,6 +82,6 @@ test('Test program reads out what it receives as input', async done => {
 })
 
 test('part1 input should be', async done => {
-  expect(await part1(challengeInput)).toEqual([])
+  expect(await part1(challengeInput)).toEqual('8332629')
   done()
 })

@@ -103,16 +103,16 @@ export class Computer {
 
   async executeInstruction (stackPointer: number): Promise<number> {
     const intCode = this.memory[stackPointer]
-    console.log(`Int code ${this.memory[stackPointer]} at ${stackPointer}`)
     const op = intCode % 100
+    const parameterSize = this.operationsParameterSize[op]
     const parameterModes = Math.floor(intCode / 100)
     const argsStart = stackPointer + 1
-    const argsEnd = argsStart + this.operationsParameterSize[op]
+    const argsEnd = argsStart + parameterSize
     const args = this.memory.slice(argsStart, argsEnd)
     for (
-      let i = 1, j = argsEnd - 1, k = args.length - 1;
+      let i = 1, j = argsStart, k = 0;
       i <= parameterModes;
-      i *= 10, j--, k--
+      i *= 10, j++, k++
     ) {
       const parameterMode = (Math.floor(parameterModes / i)) % 10
       if (parameterMode === 1) {
