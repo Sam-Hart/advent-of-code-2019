@@ -7,16 +7,29 @@ export async function part1 (puzzleInput: string): Promise<string> {
   const diagnosticTool = new DiagnosticClient()
   const intCodeComputer = new Computer(intCodes, diagnosticTool)
   await intCodeComputer.executeProgram()
-  console.log(diagnosticTool.messages)
   return Promise.resolve(diagnosticTool.messages.pop() || 'No logged messages')
 }
 
-export function part2 (puzzleInput: string) {}
+export async function part2 (puzzleInput: string) {
+  const intCodes = puzzleInput
+    .trim()
+    .split(',')
+    .map(Number)
+
+  const diagnosticTool = new DiagnosticClient('5')
+  const intCodeComputer = new Computer(intCodes, diagnosticTool)
+  await intCodeComputer.executeProgram()
+  return Promise.resolve(diagnosticTool.messages.pop() || 'No logged messages')
+}
 
 export class DiagnosticClient implements Client {
   messages: Array<string> = []
+  input: string
+  constructor (fakeIn: string = '1') {
+    this.input = fakeIn
+  }
 
-  prompt = () => Promise.resolve('1')
+  prompt = () => Promise.resolve(this.input)
 
   output = (message: number) => {
     this.messages.push(message.toString())
@@ -28,6 +41,10 @@ enum Operation {
   Multiplication = 2,
   Write = 3,
   Read = 4,
+  TrueJump = 5,
+  FalseJump = 6,
+  LessThan = 7,
+  Equals = 8,
   Halt = 99
 }
 
@@ -43,16 +60,24 @@ export class Computer {
     [Operation.Multiplication]: 3,
     [Operation.Read]: 1,
     [Operation.Write]: 1,
+    [Operation.TrueJump]: 2,
+    [Operation.FalseJump]: 2,
+    [Operation.LessThan]: 3,
+    [Operation.Equals]: 3,
     [Operation.Halt]: 0
   }
 
   operations: {
-    [key in Operation | number]: (args: number[]) => Promise<number>
+    [key in Operation | number]: (args: number[]) => Promise<number | null>
   } = {
     [Operation.Addition]: this.addition,
     [Operation.Multiplication]: this.multiplication,
     [Operation.Read]: this.read,
     [Operation.Write]: this.write,
+    [Operation.TrueJump]: this.jumpTrue,
+    [Operation.FalseJump]: this.jumpFalse,
+    [Operation.LessThan]: this.lessThan,
+    [Operation.Equals]: this.equals,
     [Operation.Halt]: this.halt
   }
 
@@ -61,44 +86,83 @@ export class Computer {
     this.memory = p
   }
 
-  addition ([addendLoc, augendLoc, sumLoc]: Array<number>): Promise<number> {
+  addition ([addendLoc, augendLoc, sumLoc]: Array<number>): Promise<null> {
     this.memory[sumLoc] = this.memory[addendLoc] + this.memory[augendLoc]
-    return Promise.resolve(0)
+    return Promise.resolve(null)
   }
 
   multiplication (
     [multiplicandLoc, multiplierLoc, productLoc]: Array<number>
-  ): Promise<number> {
+  ): Promise<null> {
     this.memory[productLoc] = this.memory[multiplicandLoc] *
       this.memory[multiplierLoc]
 
-    return Promise.resolve(0)
+    return Promise.resolve(null)
   }
 
-  read ([readLoc]: Array<number>): Promise<number> {
+  read ([readLoc]: Array<number>): Promise<null> {
     this.client.output(this.memory[readLoc])
-    return Promise.resolve(0)
+    return Promise.resolve(null)
   }
 
-  write ([writeLoc]: Array<number>): Promise<number> {
+  write ([writeLoc]: Array<number>): Promise<null> {
     return new Promise((resolve, reject) => {
       this.client.prompt()
         .then(input => {
           const newValue = Number(input)
-          if (!isNaN(newValue)) {
-            this.memory[writeLoc] = newValue
-            resolve(0)
-          } else {
+          if (isNaN(newValue)) {
             throw new Error()
           }
+          this.memory[writeLoc] = newValue
+          resolve(null)
         })
         .catch(reject)
     })
   }
 
-  halt (): Promise<number> {
+  jumpTrue (
+    [truthLoc, jumpLoc]: Array<number>
+  ): Promise<number | null> {
+    if (this.memory[truthLoc] !== 0) {
+      return Promise.resolve(this.memory[jumpLoc])
+    }
+    return Promise.resolve(null)
+  }
+
+  jumpFalse (
+    [truthLoc, jumpLoc]: Array<number>
+  ): Promise<number | null> {
+    if (this.memory[truthLoc] === 0) {
+      return Promise.resolve(this.memory[jumpLoc])
+    }
+    return Promise.resolve(null)
+  }
+
+  lessThan (
+    [aCondLoc, bCondLoc, truthLoc]: Array<number>
+  ): Promise<null> {
+    if (this.memory[aCondLoc] < this.memory[bCondLoc]) {
+      this.memory[truthLoc] = 1
+    } else {
+      this.memory[truthLoc] = 0
+    }
+    return Promise.resolve(null)
+  }
+
+  equals (
+    [aCondLoc, bCondLoc, truthLoc]: Array<number>
+  ): Promise<null> {
+    if (this.memory[aCondLoc] === this.memory[bCondLoc]) {
+      this.memory[truthLoc] = 1
+    } else {
+      this.memory[truthLoc] = 0
+    }
+    return Promise.resolve(null)
+  }
+
+  halt (): Promise<null> {
     this.halted = true
-    return Promise.resolve(0)
+    return Promise.resolve(null)
   }
 
   async executeInstruction (stackPointer: number): Promise<number> {
@@ -123,12 +187,13 @@ export class Computer {
     const operation: (program: number[]) => Promise<number> =
       this.operations[op].bind(this)
 
-    await operation(args)
-    return argsEnd
+    const completed = await operation(args)
+    return completed === null ? argsEnd : completed
   }
 
   async executeProgram (stackPointer = 0): Promise<Array<number>> {
     const updatedStackPointer = await this.executeInstruction(stackPointer)
+
     if (!this.halted) {
       await this.executeProgram(updatedStackPointer)
     }

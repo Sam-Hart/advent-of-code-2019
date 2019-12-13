@@ -4,8 +4,12 @@ import challengeInput from '@test/day-5/challengeInput.txt'
 
 class MockClient implements Client {
   messages: Array<string> = []
+  input: string
+  constructor (fakeIn: string = '1') {
+    this.input = fakeIn
+  }
 
-  prompt = jest.fn(() => Promise.resolve('1'))
+  prompt = jest.fn(() => Promise.resolve(this.input))
 
   output = jest.fn((message: number) => {
     this.messages.push(message.toString())
@@ -81,7 +85,104 @@ test('Test program reads out what it receives as input', async done => {
   done()
 })
 
+test('Program should output a 1 when given input is 8', async done => {
+  const mock = new MockClient('8')
+  const comp = new Computer(
+    [3, 9, 8, 9, 10, 9, 4, 9, 99, -1, 8],
+    mock
+  )
+  await comp.executeProgram()
+  expect(mock.messages).toEqual(['1'])
+  done()
+})
+
+test('Program should output 0 when given input is 8', async done => {
+  const mock = new MockClient('256')
+  const comp = new Computer(
+    [3, 9, 8, 9, 10, 9, 4, 9, 99, -1, 8],
+    mock
+  )
+  await comp.executeProgram()
+  expect(mock.messages).toEqual(['0'])
+  done()
+})
+
+test('Program should respect immediate mode with equals instruction', async done => {
+  const mock = new MockClient('8')
+  const comp = new Computer(
+    [3, 3, 1108, -1, 8, 3, 4, 3, 99],
+    mock
+  )
+  await comp.executeProgram()
+  expect(mock.messages).toEqual(['1'])
+  done()
+})
+
+test('Program should respect immediate mode with less than instruction', async done => {
+  const mock = new MockClient('4')
+  const comp = new Computer(
+    [3, 3, 1107, -1, 8, 3, 4, 3, 99],
+    mock
+  )
+  await comp.executeProgram()
+  expect(mock.messages).toEqual(['1'])
+  done()
+})
+
+test('Jumps should respect position mode', async done => {
+  const program = [3, 12, 6, 12, 15, 1, 13, 14, 13, 4, 13, 99, -1, 0, 1, 9]
+  const posMock = new MockClient('15614')
+  const posComp = new Computer(
+    program,
+    posMock
+  )
+  await posComp.executeProgram()
+  expect(posMock.messages).toEqual(['1'])
+  done()
+})
+
+test('Jumps should respect immediate mode', async done => {
+  const program = [3, 3, 1105, -1, 9, 1101, 0, 0, 12, 4, 12, 99, 1]
+  const posMock = new MockClient('12')
+  const posComp = new Computer(
+    program,
+    posMock
+  )
+  await posComp.executeProgram()
+  expect(posMock.messages).toEqual(['1'])
+  done()
+})
+
+test('Test input will produce 999 when singular input is less than 8', async done => {
+  const mock = new MockClient('1')
+  const comp = new Computer(testInput.trim().split(',').map(Number), mock)
+  await comp.executeProgram()
+  expect(mock.messages).toEqual(['999'])
+  done()
+})
+
+test('Test input will produce 1000 when singular input is 8', async done => {
+  const mock = new MockClient('8')
+  const comp = new Computer(testInput.trim().split(',').map(Number), mock)
+  await comp.executeProgram()
+  expect(mock.messages).toEqual(['1000'])
+  done()
+})
+
+test('Test input will produce 1000 when singular input is 8', async done => {
+  const mock = new MockClient('15')
+  const comp = new Computer(testInput.trim().split(',').map(Number), mock)
+  await comp.executeProgram()
+  expect(mock.messages).toEqual(['1001'])
+  done()
+})
+
 test('part1 input should be', async done => {
   expect(await part1(challengeInput)).toEqual('8332629')
+  done()
+})
+
+test('part2 input should be ', async done => {
+  expect(await part2(challengeInput)).toEqual('8805067')
   done()
 })
