@@ -1,6 +1,3 @@
-import * as util from 'util'
-import { Maybe } from 'tsmonad'
-
 export function part1 (puzzleInput: string): number {
   const orbits = puzzleInput
     .trim()
