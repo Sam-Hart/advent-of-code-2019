@@ -83,7 +83,7 @@ class LinkedAmplifierClient implements Client {
         nextOut += 1
         yield linkedOut[nextOut - 1]
       } else {
-        yield undefined
+        yield
       }
     }
   }
