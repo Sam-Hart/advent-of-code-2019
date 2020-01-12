@@ -56,7 +56,7 @@ function calculateOrbits (orbit: Node): number {
 
 export class Node {
   name: string
-  _parent: Node
+  _parent?: Node
   _children: Array<Node> = []
   _indirectChildren: Array<Node> = []
 
@@ -127,6 +127,6 @@ export class Node {
   }
 
   get parent () {
-    return this._parent
+    return this._parent!
   }
 }
