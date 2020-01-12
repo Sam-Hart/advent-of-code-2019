@@ -50,7 +50,9 @@ export async function part2 (puzzleInput: string): Promise<number> {
     }
     await Promise.all(executions)
     const thrusterE = clients[clients.length - 1]
-    executionThrusterOuts.push(Number(thrusterE.messages[thrusterE.messages.length - 1]))
+    executionThrusterOuts.push(
+      Number(thrusterE.messages[thrusterE.messages.length - 1])
+    )
   }
   return Promise.resolve(Math.max(...executionThrusterOuts))
 }
