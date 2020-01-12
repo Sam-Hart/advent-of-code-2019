@@ -11,6 +11,11 @@ module.exports = {
     '^.+\\.txt$': 'jest-raw-loader'
   },
   collectCoverage: true,
+  globals: {
+    'ts-jest': {
+      warnOnly: false
+    }
+  },
   moduleNameMapper: {
     '@app/(.*)': '<rootDir>/src/$1',
     '@test/(.*)': '<rootDir>/src/__tests__/$1'

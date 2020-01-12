@@ -1,3 +1,5 @@
+import { EventEmitter } from 'events'
+
 export async function part1 (puzzleInput: string): Promise<string> {
   const intCodes = puzzleInput
     .trim()
@@ -25,6 +27,7 @@ export async function part2 (puzzleInput: string) {
 export class DiagnosticClient implements Client {
   messages: Array<string> = []
   input: string
+  emitter: EventEmitter
   constructor (fakeIn: string = '1') {
     this.input = fakeIn
   }
@@ -105,19 +108,15 @@ export class Computer {
     return Promise.resolve(null)
   }
 
-  write ([writeLoc]: Array<number>): Promise<null> {
-    return new Promise((resolve, reject) => {
-      this.client.prompt()
-        .then(input => {
-          const newValue = Number(input)
-          if (isNaN(newValue)) {
-            throw new Error()
-          }
-          this.memory[writeLoc] = newValue
-          resolve(null)
-        })
-        .catch(reject)
-    })
+  async write ([writeLoc]: Array<number>): Promise<null> {
+    const c = this
+    let input = await this.client.prompt()
+    const newValue = Number(input)
+    if (isNaN(newValue)) {
+      throw new Error()
+    }
+    c.memory[writeLoc] = newValue
+    return null
   }
 
   jumpTrue (
