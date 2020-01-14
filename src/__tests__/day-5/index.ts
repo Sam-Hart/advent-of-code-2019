@@ -186,3 +186,21 @@ test('part2 input should be ', async done => {
   expect(await part2(challengeInput)).toEqual('8805067')
   done()
 })
+
+test('Program should output 1125899906842624', async done => {
+  const mock = new MockClient()
+  const program = [104, 1125899906842624, 99]
+  const comp = new Computer(program, mock)
+  await comp.executeProgram()
+  expect(mock.messages).toEqual(['1125899906842624'])
+  done()
+})
+
+test('Program should output a 16-digit number', async done => {
+  const mock = new MockClient()
+  const program = [1102, 34915192, 34915192, 7, 4, 7, 99, 0]
+  const comp = new Computer(program, mock)
+  await comp.executeProgram()
+  expect(mock.messages[0].length).toEqual(16)
+  done()
+})

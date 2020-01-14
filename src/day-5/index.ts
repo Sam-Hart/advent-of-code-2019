@@ -48,6 +48,7 @@ enum Operation {
   FalseJump = 6,
   LessThan = 7,
   Equals = 8,
+  RelativeBaseChange = 9,
   Halt = 99
 }
 
@@ -55,6 +56,7 @@ export class Computer {
   client: Client
   memory: Array<number>
   halted: boolean = false
+  relativeBase = 0
 
   operationsParameterSize: {
     [key in Operation | number]: number
@@ -67,6 +69,7 @@ export class Computer {
     [Operation.FalseJump]: 2,
     [Operation.LessThan]: 3,
     [Operation.Equals]: 3,
+    [Operation.RelativeBaseChange]: 1,
     [Operation.Halt]: 0
   }
 
@@ -81,6 +84,7 @@ export class Computer {
     [Operation.FalseJump]: this.jumpFalse,
     [Operation.LessThan]: this.lessThan,
     [Operation.Equals]: this.equals,
+    [Operation.RelativeBaseChange]: this.baseChange,
     [Operation.Halt]: this.halt
   }
 
@@ -159,6 +163,13 @@ export class Computer {
     return Promise.resolve(null)
   }
 
+  baseChange (
+    [newBaseLoc]: Array<number>
+  ): Promise<null> {
+    this.relativeBase += (this.memory[newBaseLoc] || 0)
+    return Promise.resolve(null)
+  }
+
   halt (): Promise<null> {
     this.halted = true
     return Promise.resolve(null)
@@ -172,6 +183,10 @@ export class Computer {
     const argsStart = stackPointer + 1
     const argsEnd = argsStart + parameterSize
     const args = this.memory.slice(argsStart, argsEnd)
+
+    // FIXME: Parameter mode logic is becoming challenging to test, and
+    // adding if statements for every type of parameter mode will become
+    // hairy if more are added
     for (
       let i = 1, j = argsStart, k = 0;
       i <= parameterModes;
@@ -180,6 +195,8 @@ export class Computer {
       const parameterMode = (Math.floor(parameterModes / i)) % 10
       if (parameterMode === 1) {
         args[k] = j
+      } else if (parameterMode === 2) {
+        args[k] += this.relativeBase
       }
     }
 
