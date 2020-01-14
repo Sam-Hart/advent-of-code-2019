@@ -89,11 +89,13 @@ export class Computer {
   }
 
   constructor (p: Array<number>, c: Client) {
-    this.client = c
     this.memory = p
+    this.client = c
   }
 
-  addition ([addendLoc, augendLoc, sumLoc]: Array<number>): Promise<null> {
+  addition ([
+    addendLoc, augendLoc, sumLoc]: Array<number>
+  ): Promise<null> {
     this.memory[sumLoc] = this.memory[addendLoc] + this.memory[augendLoc]
     return Promise.resolve(null)
   }
@@ -107,12 +109,16 @@ export class Computer {
     return Promise.resolve(null)
   }
 
-  read ([readLoc]: Array<number>): Promise<null> {
+  read (
+    [readLoc]: Array<number>
+  ): Promise<null> {
     this.client.output(this.memory[readLoc])
     return Promise.resolve(null)
   }
 
-  async write ([writeLoc]: Array<number>): Promise<null> {
+  async write (
+    [writeLoc]: Array<number>
+  ): Promise<null> {
     const c = this
     let input = await this.client.prompt()
     const newValue = Number(input)
