@@ -110,7 +110,7 @@ export class Node {
   get tree (): Array<Node> {
     const tree = this.children.reduce((children, child) => {
       return children.concat(child.tree)
-    }, new Array<Node>())
+    }, [] as Array<Node>)
     tree.push(this)
     return tree
   }
@@ -118,7 +118,7 @@ export class Node {
   get indirectChildren () {
     return this.children.reduce((indirectChildren, child) => {
       return indirectChildren.concat(child.tree)
-    }, new Array<Node>())
+    }, [] as Array<Node>)
   }
 
   get children () {
