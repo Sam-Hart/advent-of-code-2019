@@ -81,7 +81,10 @@ export class Node {
     if (this.indirectChildren.includes(target)) {
       for (let i = 0; i < this.children.length; i++) {
         const child = this.children[i]
-        if (child.children.includes(target) || child.indirectChildren.includes(target)) {
+        if (
+          child.children.includes(target) ||
+          child.indirectChildren.includes(target)
+        ) {
           distance += this.children[i].distanceFrom(target) + 1
           return distance
         }
@@ -108,17 +111,23 @@ export class Node {
   }
 
   get tree (): Array<Node> {
-    const tree = this.children.reduce((children, child) => {
-      return children.concat(child.tree)
-    }, [] as Array<Node>)
+    const tree = this.children.reduce(
+      (children, child) => {
+        return children.concat(child.tree)
+      },
+      [] as Array<Node>
+    )
     tree.push(this)
     return tree
   }
 
   get indirectChildren () {
-    return this.children.reduce((indirectChildren, child) => {
-      return indirectChildren.concat(child.tree)
-    }, [] as Array<Node>)
+    return this.children.reduce(
+      (indirectChildren, child) => {
+        return indirectChildren.concat(child.tree)
+      },
+      [] as Array<Node>
+    )
   }
 
   get children () {
