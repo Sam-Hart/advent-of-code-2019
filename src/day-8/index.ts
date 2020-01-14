@@ -13,14 +13,14 @@ export function part1 (puzzleInput: string): number {
       ): Array<Array<number>> => {
         const x = pixelIndex % imageWidth
         const y = pixelIndex % imageHeight
-        if (x === 0 && y === 0){
+        if (x === 0 && y === 0) {
           layers.push([])
         }
         const layer = layers[layers.length - 1]
         layer.push(pixel)
         return layers
       },
-      new Array()
+      []
     )
 
   const zeroesPerLayer = encodedImageLayers
@@ -56,14 +56,14 @@ export function part2 (puzzleInput: string) {
       ): Array<Array<number>> => {
         const x = pixelIndex % imageWidth
         const y = pixelIndex % imageHeight
-        if (x === 0 && y === 0){
+        if (x === 0 && y === 0) {
           layers.push([])
         }
         const layer = layers[layers.length - 1]
         layer.push(pixel)
         return layers
       },
-      new Array()
+      []
     )
 
   const compiledImage = encodedImageLayers

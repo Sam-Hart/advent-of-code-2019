@@ -53,7 +53,6 @@ function calculateOrbits (orbit: Node): number {
   }
 }
 
-
 export class Node {
   name: string
   _parent?: Node

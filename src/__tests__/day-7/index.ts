@@ -46,7 +46,6 @@ test('Max thruster using a feedback loop output from testInput4 is 139629729', a
     })
 })
 
-
 test('Max thruster using a feedback loop output from testInput5 is 18216', async done => {
   part2(testInput5)
     .then(output => {

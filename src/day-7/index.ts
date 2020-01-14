@@ -71,9 +71,8 @@ class LinkedAmplifierClient implements Client {
     this.emitter = new EventEmitter()
   }
 
-  *getInputs () {
+  * getInputs () {
     const linkedOut = this.linkedComputer.client.messages
-    
     yield this.phaseSetting
     if (this.initialValue === 0) {
       yield 0
@@ -94,12 +93,11 @@ class LinkedAmplifierClient implements Client {
     this.linkedComputer = c
   }
 
-
   prompt = (): Promise<string> => {
     return new Promise(resolve => {
       const retrievedInput = this.inputs.next().value
       if (retrievedInput === undefined) {
-        let linkedClient = <LinkedAmplifierClient>this.linkedComputer.client
+        const linkedClient = <LinkedAmplifierClient> this.linkedComputer.client
         linkedClient.emitter.once('newMessage', () => {
           resolve(this.inputs.next().value)
         })
@@ -122,7 +120,7 @@ class AmplifierClient implements Client {
     this.inputs = this.getInput(inputs)
   }
 
-  *getInput (inputs: Array<string>) {
+  * getInput (inputs: Array<string>) {
     for (let i = 0; i < inputs.length; i++) {
       yield inputs[i]
     }
@@ -138,7 +136,7 @@ class AmplifierClient implements Client {
 function heapPermutation (
   list: Array<number>, size = list.length, n: number = list.length
 ): Array<Array<number>> {
-  let newList: Array<Array<number>> = new Array()
+  let newList: Array<Array<number>> = []
   if (size === 1) {
     newList.push([...list])
     return newList

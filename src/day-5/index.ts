@@ -120,7 +120,7 @@ export class Computer {
     [writeLoc]: Array<number>
   ): Promise<null> {
     const c = this
-    let input = await this.client.prompt()
+    const input = await this.client.prompt()
     const newValue = Number(input)
     if (isNaN(newValue)) {
       throw new Error()
