@@ -12,35 +12,14 @@ function fractionReduce (
   ]
 }
 
-export function part1 (puzzleInput: string): [Point, number] {
-  const asteroids: Map<Point, Set<Point>> = puzzleInput
-    .trim()
-    .split('\n')
-    .reduce(
-      (knownAsteroidLocations, horizontalSpace, y) => {
-        const newAsteroidLocations = horizontalSpace
-          .split('')
-          .reduce(
-            (lineAsteroids, locationFill, x) => {
-              if (locationFill === '#') {
-                lineAsteroids.set({ x, y }, new Set())
-              }
-              return lineAsteroids
-            },
-            new Map<Point, Set<Point>>()
-          )
-        return new Map([
-          ...knownAsteroidLocations,
-          ...newAsteroidLocations
-        ])
-      },
-      new Map<Point, Set<Point>>()
-    )
-
+function determineAsteroidVisibility (
+  asteroids: Set<Point>
+): Map<Point, Set<Point>> {
   const asteroidsToCheck = new Set([...asteroids.keys()])
-  asteroids.forEach((_, asteroid) => {
+  const asteroidVisibility: Map<Point, Set<Point>> = new Map()
+  asteroids.forEach((asteroid) => {
     asteroidsToCheck.delete(asteroid)
-    const roids = [...asteroids.keys()]
+    const roids = [...asteroids.values()]
     asteroidsToCheck.forEach(checkAsteroid => {
       const run = checkAsteroid.x - asteroid.x
       const rise = checkAsteroid.y - asteroid.y
@@ -63,13 +42,49 @@ export function part1 (puzzleInput: string): [Point, number] {
           }
         })
       } while (target === undefined)
-      const targetSeen = asteroids.get(target) || new Set()
+      const targetSeen: Set<Point> = asteroidVisibility.get(target) ||
+        asteroidVisibility.set(target, new Set()).get(target) ||
+        new Set()
       targetSeen.add(asteroid)
-      const sourceSeen = asteroids.get(asteroid) || new Set()
+      const sourceSeen: Set<Point> = asteroidVisibility.get(asteroid) ||
+        asteroidVisibility.set(asteroid, new Set()).get(asteroid) ||
+        new Set()
       sourceSeen.add(target)
     })
   })
 
+  return asteroidVisibility
+}
+
+function findKnownAsteroids (map: string): Set<Point> {
+  return map
+    .trim()
+    .split('\n')
+    .reduce(
+      (knownAsteroidLocations, horizontalSpace, y) => {
+        const newAsteroidLocations = horizontalSpace
+          .split('')
+          .reduce(
+            (lineAsteroids, locationFill, x) => {
+              if (locationFill === '#') {
+                lineAsteroids.add({ x, y })
+              }
+              return lineAsteroids
+            },
+            new Set<Point>()
+          )
+        return new Set([
+          ...knownAsteroidLocations,
+          ...newAsteroidLocations
+        ])
+      },
+      new Set<Point>()
+    )
+}
+
+export function part1 (puzzleInput: string): [Point, number] {
+  const knownAsteroids: Set<Point> = findKnownAsteroids(puzzleInput)
+  const asteroids = determineAsteroidVisibility(knownAsteroids)
   return Array
     .from(asteroids.entries())
     .reduce(
@@ -84,4 +99,8 @@ export function part1 (puzzleInput: string): [Point, number] {
     )
 }
 
-export function part2 () {}
+export function part2 (puzzleInput: string): Point {
+  const base = part1(puzzleInput)[0]
+
+  return { x: 0, y: 0 }
+}
