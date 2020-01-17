@@ -73,11 +73,12 @@ export class Node {
     if (target === this) {
       return distance
     }
+
     const possibleChild = this.children.find(child => target === child)
     if (possibleChild) {
-      distance += 1
-      return distance
+      return distance + 1
     }
+
     if (this.indirectChildren.includes(target)) {
       for (let i = 0; i < this.children.length; i++) {
         const child = this.children[i]
@@ -85,8 +86,7 @@ export class Node {
           child.children.includes(target) ||
           child.indirectChildren.includes(target)
         ) {
-          distance += this.children[i].distanceFrom(target) + 1
-          return distance
+          return distance + this.children[i].distanceFrom(target) + 1
         }
       }
     }
