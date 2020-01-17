@@ -12,44 +12,61 @@ function fractionReduce (
   ]
 }
 
+function getAsteroidsVisibleFromLocation (
+  asteroid: Point,
+  knownAsteroids: Set<Point>,
+  asteroidsToCheck: Set<Point> = knownAsteroids
+): Set<Point> {
+  const roids = [...knownAsteroids.values()]
+  const visible = new Set<Point>()
+  asteroidsToCheck.forEach(checkAsteroid => {
+    const run = checkAsteroid.x - asteroid.x
+    const rise = checkAsteroid.y - asteroid.y
+    const [reducedRise, reducedRun] = fractionReduce(rise, run)
+    const inlineLocation: Point = {
+      x: asteroid.x,
+      y: asteroid.y
+    }
+    let target: Point | undefined
+
+    do {
+      inlineLocation.x += reducedRun
+      inlineLocation.y += reducedRise
+      target = roids.find(potentialAsteroid => {
+        if (
+          potentialAsteroid.x === inlineLocation.x &&
+          potentialAsteroid.y === inlineLocation.y
+        ) {
+          return potentialAsteroid
+        }
+      })
+    } while (target === undefined)
+    visible.add(target)
+  })
+  return visible
+}
+
 function determineAsteroidVisibility (
   asteroids: Set<Point>
 ): Map<Point, Set<Point>> {
-  const asteroidsToCheck = new Set([...asteroids.keys()])
+  const asteroidsToCheck = new Set([...asteroids.values()])
   const asteroidVisibility: Map<Point, Set<Point>> = new Map()
   asteroids.forEach((asteroid) => {
     asteroidsToCheck.delete(asteroid)
-    const roids = [...asteroids.values()]
-    asteroidsToCheck.forEach(checkAsteroid => {
-      const run = checkAsteroid.x - asteroid.x
-      const rise = checkAsteroid.y - asteroid.y
-      const [reducedRise, reducedRun] = fractionReduce(rise, run)
-      const inlineLocation: Point = {
-        x: asteroid.x,
-        y: asteroid.y
-      }
-      let target: Point | undefined
-
-      do {
-        inlineLocation.x += reducedRun
-        inlineLocation.y += reducedRise
-        target = roids.find(potentialAsteroid => {
-          if (
-            potentialAsteroid.x === inlineLocation.x &&
-            potentialAsteroid.y === inlineLocation.y
-          ) {
-            return potentialAsteroid
-          }
-        })
-      } while (target === undefined)
-      const targetSeen: Set<Point> = asteroidVisibility.get(target) ||
-        asteroidVisibility.set(target, new Set()).get(target) ||
-        new Set()
-      targetSeen.add(asteroid)
-      const sourceSeen: Set<Point> = asteroidVisibility.get(asteroid) ||
-        asteroidVisibility.set(asteroid, new Set()).get(asteroid) ||
-        new Set()
-      sourceSeen.add(target)
+    const visibleAsteroids = getAsteroidsVisibleFromLocation(
+      asteroid,
+      asteroids,
+      asteroidsToCheck
+    )
+    const knownToAsteroid = asteroidVisibility.get(asteroid) || new Set()
+    asteroidVisibility.set(
+      asteroid,
+      new Set([...knownToAsteroid, ...visibleAsteroids])
+    )
+    visibleAsteroids.forEach(known => {
+      const knownVisible = asteroidVisibility.get(known) || new Set()
+      knownVisible.add(asteroid)
+      asteroidVisibility.set(known, knownVisible)
     })
   })
 
