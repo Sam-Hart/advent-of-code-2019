@@ -45,3 +45,19 @@ test('The challenge maps best location is with x asteroids', () => {
   expect(bestLocation[0].y).toEqual(28)
   expect(bestLocation[1]).toEqual(267)
 })
+
+test('The 200th asteroid to be destroyed by the laser for testInput5 is 8, 2', () => {
+  const destroyedAsteroids = part2(testInput5)
+  expect(destroyedAsteroids[199].x.toFixed(0)).toEqual('8')
+  expect(destroyedAsteroids[199].y.toFixed(0)).toEqual('2')
+})
+
+test(
+  `The 200th asteroid to be destroyed by the laser's x coordinate
+  multiplied by 100 and y coordinate added for the
+  challengeInput should be`,
+  () => {
+    const betAsteroid = part2(challengeInput)[199]
+    expect((betAsteroid.x * 100 + betAsteroid.y).toFixed(0)).toEqual('1309')
+  }
+)

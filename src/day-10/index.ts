@@ -99,6 +99,45 @@ function findKnownAsteroids (map: string): Set<Point> {
     )
 }
 
+function destroyAsteroidsFromBase (
+  base: Point,
+  knownAsteroids: Set<Point>
+): Array<Point> {
+  const alreadyDestroyedAsteroids = [] as Array<Point>
+  if (knownAsteroids.size === 0) {
+    return alreadyDestroyedAsteroids
+  } else {
+    const asteroidsToDestroy = getAsteroidsVisibleFromLocation(
+      base,
+      knownAsteroids
+    )
+    for (const asteroid of asteroidsToDestroy) {
+      knownAsteroids.delete(asteroid)
+    }
+    const sortedAsteroids = Array
+      .from(asteroidsToDestroy)
+      .map((asteroid): PolarPoint => {
+        const x = asteroid.x - base.x
+        const y = asteroid.y - base.y
+        const h = Math.sqrt(x * x + y * y)
+        return {
+          distance: h,
+          radians: Math.atan2(x, y)
+        }
+      })
+      .sort((a, b) => a.radians < b.radians ? 1 : -1)
+      .map(polar => ({
+        x: (polar.distance * Math.sin(polar.radians)) + base.x,
+        y: (polar.distance * Math.cos(polar.radians)) + base.y
+      }))
+    const remainingAsteroidsToDestroy = destroyAsteroidsFromBase(
+      base,
+      knownAsteroids
+    )
+    return [...sortedAsteroids, ...remainingAsteroidsToDestroy]
+  }
+}
+
 export function part1 (puzzleInput: string): [Point, number] {
   const knownAsteroids: Set<Point> = findKnownAsteroids(puzzleInput)
   const asteroids = determineAsteroidVisibility(knownAsteroids)
@@ -116,8 +155,22 @@ export function part1 (puzzleInput: string): [Point, number] {
     )
 }
 
-export function part2 (puzzleInput: string): Point {
-  const base = part1(puzzleInput)[0]
-
-  return { x: 0, y: 0 }
+export function part2 (puzzleInput: string): Array<Point> {
+  const knownAsteroids: Set<Point> = findKnownAsteroids(puzzleInput)
+  const asteroids = determineAsteroidVisibility(knownAsteroids)
+  const base = Array
+    .from(asteroids.entries())
+    .reduce(
+      (
+        [mostSeenAsteroid, mostTimes]: [Point, number],
+        [asteroid, seen]: [Point, Set<Point>]
+      ): [Point, number] => (seen.size > mostTimes
+        ? [asteroid, seen.size]
+        : [mostSeenAsteroid, mostTimes]
+      ),
+      [{ x: 0, y: 0 }, 0]
+    )[0]
+  knownAsteroids.delete(base)
+  const destroyedAsteroids = destroyAsteroidsFromBase(base, knownAsteroids)
+  return destroyedAsteroids
 }
