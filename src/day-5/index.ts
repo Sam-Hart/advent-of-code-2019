@@ -93,8 +93,8 @@ export class Computer {
     this.client = c
   }
 
-  addition ([
-    addendLoc, augendLoc, sumLoc]: Array<number>
+  addition (
+    [addendLoc, augendLoc, sumLoc]: Array<number>
   ): Promise<null> {
     this.memory[sumLoc] = this.memory[addendLoc] + this.memory[augendLoc]
     return Promise.resolve(null)
