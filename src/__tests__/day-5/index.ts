@@ -1,4 +1,4 @@
-import { part1, part2, Computer } from '@app/day-5'
+import { part1, part2, Computer, Client } from '@app/day-5'
 import testInput from '@test/day-5/testInput.txt'
 import challengeInput from '@test/day-5/challengeInput.txt'
 

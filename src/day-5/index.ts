@@ -1,4 +1,9 @@
 import { EventEmitter } from 'events'
+export declare interface Client {
+  messages: Array<string>
+  prompt: () => Promise<string>
+  output: (s: number) => void
+}
 
 export async function part1 (puzzleInput: string): Promise<string> {
   const intCodes = puzzleInput
@@ -27,7 +32,7 @@ export async function part2 (puzzleInput: string) {
 export class DiagnosticClient implements Client {
   messages: Array<string> = []
   input: string
-  emitter: EventEmitter
+  emitter?: EventEmitter
   constructor (fakeIn: string = '1') {
     this.input = fakeIn
   }
@@ -206,7 +211,7 @@ export class Computer {
       }
     }
 
-    const operation: (program: number[]) => Promise<number> =
+    const operation: (args: number[]) => Promise<number | null> =
       this.operations[op].bind(this)
 
     const completed = await operation(args)

@@ -27,5 +27,12 @@ module.exports = {
         "jest"
     ],
     "rules": {
+      "no-unused-vars": "off",
+      "no-labels": [
+        "error", { "allowLoop": true }
+      ],
+      "@typescript-eslint/no-unused-vars": [
+        "error"
+      ]
     }
 };

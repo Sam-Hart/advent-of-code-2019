@@ -1,4 +1,4 @@
-import { Computer } from '@app/day-5'
+import { Computer, Client } from '@app/day-5'
 
 export async function part1 (puzzleInput: string): Promise<number> {
   const intCodes = puzzleInput

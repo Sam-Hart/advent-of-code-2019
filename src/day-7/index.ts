@@ -1,4 +1,4 @@
-import { Computer } from '@app/day-5'
+import { Computer, Client } from '@app/day-5'
 import { EventEmitter } from 'events'
 import { range } from 'lodash'
 
@@ -60,7 +60,7 @@ export async function part2 (puzzleInput: string): Promise<number> {
 class LinkedAmplifierClient implements Client {
   messages: Array<string> = []
   phaseSetting: number
-  linkedComputer: Computer
+  linkedComputer!: Computer
   inputs: any // shame
   emitter: EventEmitter
   initialValue: number | undefined

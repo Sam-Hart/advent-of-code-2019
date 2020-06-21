@@ -11,6 +11,9 @@ module.exports = {
     '^.+\\.txt$': 'jest-raw-loader'
   },
   collectCoverage: true,
+  collectCoverageFrom: [
+    'src/**/{!(__tests__/**),}.+(ts|tsx|js)'
+  ],
   globals: {
     'ts-jest': {
       warnOnly: false
